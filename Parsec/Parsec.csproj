@@ -44,12 +44,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Either.cs" />
-    <Compile Include="Interfaces.cs" />
-    <Compile Include="Null.cs" />
-    <Compile Include="Maybe.cs" />
-    <Compile Include="Parsec.cs" />
+    <Compile Include="Chars.cs" />
+    <Compile Include="Combinators.cs" />
+    <Compile Include="Core\Either.cs" />
+    <Compile Include="Core\Error.cs" />
+    <Compile Include="Core\Pair.cs" />
+    <Compile Include="Core\Parsec.cs" />
+    <Compile Include="Core\Optional.cs" />
+    <Compile Include="Core\Nothing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Core\Result.cs" />
+    <Compile Include="Core\TokenStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
