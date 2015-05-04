@@ -2,36 +2,42 @@
 
 namespace Parsec.Core
 {
-
-    public interface IResult<out TToken, out TOutput, out TPos> : IEither<IError, TOutput>
+    public interface IResult<out TToken, out TOutput> : IEither<IError, TOutput>
     {
         T Match<T>(
-            Func<ITokenStream<TToken, TPos>, IError, T> failure,
-            Func<ITokenStream<TToken, TPos>, TOutput, T> success);
+            Func<ITokenStream<TToken>, IError, T> failure,
+            Func<ITokenStream<TToken>, TOutput, T> success);
     }
 
     public static class Result
     {
-        public static IResult<TToken, TOutput, TPos> Success<TToken, TOutput, TPos>(
-            ITokenStream<TToken, TPos> restStream,
+        public static IResult<TToken, TOutput> Success<TToken, TOutput>(
+            ITokenStream<TToken> restStream,
             TOutput output)
         {
-            return new SuccessImpl<TToken, TOutput, TPos>(restStream, output);
+            return new SuccessImpl<TToken, TOutput>(restStream, output);
         }
 
-        public static IResult<TToken, TOutput, TPos> Failure<TToken, TOutput, TPos>(
-            ITokenStream<TToken, TPos> restStream,
+        public static bool Success<TToken, TOutput>(this IResult<TToken, TOutput> result)
+        {
+            return result.Match(
+                success: (restStream, output) => true,
+                failure: (restStream, error) => false);
+        }
+
+        public static IResult<TToken, TOutput> Failure<TToken, TOutput>(
+            ITokenStream<TToken> restStream,
             IError error)
         {
-            return new FailureImpl<TToken, TOutput, TPos>(restStream, error);
+            return new FailureImpl<TToken, TOutput>(restStream, error);
         }
 
-        private sealed class FailureImpl<TToken, TOutput, TPos> : IResult<TToken, TOutput, TPos>
+        private sealed class FailureImpl<TToken, TOutput> : IResult<TToken, TOutput>
         {
             private readonly IError _error;
-            private readonly ITokenStream<TToken, TPos> _restStream;
+            private readonly ITokenStream<TToken> _restStream;
 
-            internal FailureImpl(ITokenStream<TToken, TPos> restStream, IError error)
+            internal FailureImpl(ITokenStream<TToken> restStream, IError error)
             {
                 _error = error;
                 _restStream = restStream;
@@ -45,19 +51,19 @@ namespace Parsec.Core
             }
 
             public T Match<T>(
-                Func<ITokenStream<TToken, TPos>, IError, T> failure, 
-                Func<ITokenStream<TToken, TPos>, TOutput, T> success)
+                Func<ITokenStream<TToken>, IError, T> failure,
+                Func<ITokenStream<TToken>, TOutput, T> success)
             {
                 return failure(_restStream, _error);
             }
         }
 
-        private sealed class SuccessImpl<TToken, TOutput, TPos> : IResult<TToken, TOutput, TPos>
+        private sealed class SuccessImpl<TToken, TOutput> : IResult<TToken, TOutput>
         {
             private readonly TOutput _output;
-            private readonly ITokenStream<TToken, TPos> _restStream;
+            private readonly ITokenStream<TToken> _restStream;
 
-            internal SuccessImpl(ITokenStream<TToken, TPos> restStream, TOutput output)
+            internal SuccessImpl(ITokenStream<TToken> restStream, TOutput output)
             {
                 _output = output;
                 _restStream = restStream;
@@ -71,8 +77,8 @@ namespace Parsec.Core
             }
 
             public T Match<T>(
-                Func<ITokenStream<TToken, TPos>, IError, T> failure, 
-                Func<ITokenStream<TToken, TPos>, TOutput, T> success)
+                Func<ITokenStream<TToken>, IError, T> failure,
+                Func<ITokenStream<TToken>, TOutput, T> success)
             {
                 return success(_restStream, _output);
             }

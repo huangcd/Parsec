@@ -1,9 +1,9 @@
 ﻿namespace Parsec.Core
 {
-    public interface ITokenStream<out TToken, out TPos>
+    public interface ITokenStream<out TToken>
     {
-        ITokenStream<TToken, TPos> MoveNext();
+        ITokenStream<TToken> MoveNext();
 
-        IOptional<IPair<TToken, TPos>> Current { get; }
+        IOptional<TToken> Current { get; }
     }
 }

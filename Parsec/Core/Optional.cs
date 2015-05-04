@@ -39,6 +39,11 @@ namespace Parsec.Core
             {
                 return nothing();
             }
+
+            public override string ToString()
+            {
+                return String.Format("[Optional Nothing]");
+            }
         }
 
         private sealed class JustImpl<TValue> : IOptional<TValue>
@@ -53,6 +58,11 @@ namespace Parsec.Core
             public T Match<T>(Func<TValue, T> exists, Func<T> nothing)
             {
                 return exists(_val);
+            }
+
+            public override string ToString()
+            {
+                return String.Format("[Optional {0}]", _val);
             }
         }
     }

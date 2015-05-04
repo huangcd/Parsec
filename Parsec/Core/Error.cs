@@ -7,27 +7,19 @@ namespace Parsec.Core
         String Message { get; }
     }
 
-    public interface IError<out TPos> : IError
-    {
-        /// <summary>
-        /// Get the position which error happends
-        /// </summary>
-        TPos Pos { get; }
-    }
-
     public static class Error
     {
-        public static IError<TPos> Create<TPos>(TPos pos, String message)
+        public static IError Create(String message)
         {
-            return new ErrorImpl<TPos>(pos, message);
+            return new ErrorImpl(message);
         }
 
-        public static IError<Nothing> EndOfInput(String message)
+        public static IError EndOfInput(String message)
         {
             return new EndOfInputImpl(message);
         }
 
-        private sealed class EndOfInputImpl : IError<Nothing>
+        private sealed class EndOfInputImpl : IError
         {
             internal EndOfInputImpl(String message)
             {
@@ -39,15 +31,12 @@ namespace Parsec.Core
             public Nothing Pos { get { return Nothing.Instance; } }
         }
 
-        private sealed class ErrorImpl<TPos> : IError<TPos>
+        private sealed class ErrorImpl : IError
         {
-            internal ErrorImpl(TPos pos, String message)
+            internal ErrorImpl(String message)
             {
-                Pos = pos;
                 Message = message;
             }
-
-            public TPos Pos { get; private set; }
 
             public string Message { get; private set; }
         }
