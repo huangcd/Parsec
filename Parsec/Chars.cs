@@ -58,7 +58,7 @@ namespace Parsec
                     nothing: () => Result.Success(stream.MoveNext(), Nothing.Instance));
         }
 
-        public static Parser<Char, Char[]> Sequance(IEnumerable<Char> seq)
+        public static Parser<Char, IList<Char>> Sequance(IEnumerable<Char> seq)
         {
             return seq.Select(Char).Sequence();
         }

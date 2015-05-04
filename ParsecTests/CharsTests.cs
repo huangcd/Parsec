@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Parsec.Core;
+using System.Linq;
 
 namespace Parsec.Tests
 {
@@ -40,7 +41,7 @@ namespace Parsec.Tests
             letParser("let".AsPlainCharStream()).Match(
                 success: (restStream, chars) =>
                 {
-                    Assert.AreEqual("let", new String(chars));
+                    Assert.AreEqual("let", new String(chars.ToArray()));
                     Assert.IsTrue(Chars.EndOfInput()(restStream).Success());
                     return 0;
                 },
@@ -52,7 +53,7 @@ namespace Parsec.Tests
             letParser("leta".AsPlainCharStream()).Match(
                 success: (restStream, chars) =>
                 {
-                    Assert.AreEqual("let", new String(chars));
+                    Assert.AreEqual("let", new String(chars.ToArray()));
                     return 0;
                 },
                 failure: (restStream, error) =>
