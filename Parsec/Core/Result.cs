@@ -25,6 +25,20 @@ namespace Parsec.Core
                 failure: (restStream, error) => false);
         }
 
+        public static TOutput GetOutput<TToken, TOutput>(this IResult<TToken, TOutput> result)
+        {
+            return result.Match(
+                success: (restStream, output) => output,
+                failure: (restStream, error) => { throw new Exception("Trying to get output on a failure case"); });
+        }
+
+        public static ITokenStream<TToken> GetRestStream<TToken, TOutput>(this IResult<TToken, TOutput> result)
+        {
+            return result.Match(
+                success: (restStream, output) => restStream,
+                failure: (restStream, error) => restStream);
+        }
+
         public static IResult<TToken, TOutput> Failure<TToken, TOutput>(
             ITokenStream<TToken> restStream,
             IError error)
