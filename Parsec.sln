@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parsec", "Parsec\Parsec.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParsecTests", "ParsecTests\ParsecTests.csproj", "{AD99B8C3-5B5B-4ADB-AFCC-2A6730680B89}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Example", "Example", "{62580B9A-B742-44A6-B8FE-1EFD74ED220A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonParser", "JsonParser\JsonParser.csproj", "{806E69B9-455C-45B8-8E46-5DEB14505451}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,8 +25,15 @@ Global
 		{AD99B8C3-5B5B-4ADB-AFCC-2A6730680B89}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD99B8C3-5B5B-4ADB-AFCC-2A6730680B89}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD99B8C3-5B5B-4ADB-AFCC-2A6730680B89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{806E69B9-455C-45B8-8E46-5DEB14505451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{806E69B9-455C-45B8-8E46-5DEB14505451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{806E69B9-455C-45B8-8E46-5DEB14505451}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{806E69B9-455C-45B8-8E46-5DEB14505451}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{806E69B9-455C-45B8-8E46-5DEB14505451} = {62580B9A-B742-44A6-B8FE-1EFD74ED220A}
 	EndGlobalSection
 EndGlobal
