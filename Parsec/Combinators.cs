@@ -83,7 +83,6 @@ namespace Parsec
                 success: (restStream, output) => Result.Success(restStream, selector(output)));
         }
 
-        // TODO Bug here
         public static Parser<TToken, TOutput> SelectMany<TToken, TIntermediate1, TIntermediate2, TOutput>(
             this Parser<TToken, TIntermediate1> parser,
             Func<TIntermediate1, Parser<TToken, TIntermediate2>> selector,
