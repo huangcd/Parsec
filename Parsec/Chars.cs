@@ -73,6 +73,15 @@ namespace Parsec
                     nothing: () => EndOfInput<Char>(stream));
         }
 
+        public static Parser<Char, Char> Letter()
+        {
+            return stream => stream.Current.Match(
+                exists: token => System.Char.IsLetter(token)
+                    ? Result.Success(stream.MoveNext(), token)
+                    : Failure<Char>(stream, "Not letter"),
+                nothing: () => EndOfInput<Char>(stream));
+        }
+
         public static Parser<Char, Char> Any(IEnumerable<Char> chars)
         {
             var set = chars.ToLookup(c => c);

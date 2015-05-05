@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using Parsec.Core;
 using System.Linq;
+using Parsec;
 
 namespace Parsec.Tests
 {
@@ -135,6 +136,33 @@ namespace Parsec.Tests
             parser("".AsPlainCharStream()).Match(
                 success: (restStream, c) => /*OK*/ 0,
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
+        }
+
+        [Test()]
+        public void LetterTest()
+        {
+            var parser = Chars.Letter();
+            parser("I".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('I', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("0".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
+            parser("黄".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('黄', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+        }
+
+        [Test()]
+        public void AnyTest()
+        {
+            var parser = Combinators.Any(Chars.Char('I'), Chars.Char('J'), Chars.Char('K'));
+            Assert.IsTrue(parser("I".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("J".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("K".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("L".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("M".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("".AsPlainCharStream()).Success());
         }
     }
 }

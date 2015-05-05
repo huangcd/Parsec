@@ -39,6 +39,30 @@ namespace Parsec
                     success: Result.Success);
         }
 
+        public static Parser<TToken, TOutput> Any<TToken, TOutput>(
+            this IEnumerable<Parser<TToken, TOutput>> parsers)
+        {
+            return stream =>
+            {
+                IResult<TToken, TOutput> result = Result.Failure<TToken, TOutput>(stream, Error.Create("No parser"));
+                foreach (var parser in parsers)
+                {
+                    result = parser(stream);
+                    if (result.Success())
+                    {
+                        return result;
+                    }
+                }
+                return result;
+            };
+        }
+
+        public static Parser<TToken, TOutput> Any<TToken, TOutput>(
+            params Parser<TToken, TOutput>[] parsers)
+        {
+            return parsers.Any();
+        }
+
         public static Parser<TToken, TOutput> Where<TToken, TOutput>(
             this Parser<TToken, TOutput> parser,
             Func<TOutput, Boolean> pred)
@@ -86,6 +110,12 @@ namespace Parsec
                     success: (restStream, output) => parser(restStream).Match(
                         failure: Result.Failure<TToken, IList<TOutput>>,
                         success: (restRestStream, parserOutput) => Result.Success(restRestStream, output.Concat(new[] { parserOutput }).ToArray()))));
+        }
+
+        public static Parser<TToken, IList<TOutput>> Sequence<TToken, TOutput>(
+            params Parser<TToken, TOutput>[] parsers)
+        {
+            return parsers.Sequence();
         }
 
         public static Parser<TToken, TOutput> Succeed<TToken, TOutput>(TOutput output)
