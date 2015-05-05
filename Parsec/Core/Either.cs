@@ -9,7 +9,6 @@ namespace Parsec.Core
 
     public abstract class Either
     {
-
         public static IEither<TLeft, TRight> Left<TLeft, TRight>(TLeft left)
         {
             return new EitherLeft<TLeft, TRight>(left);

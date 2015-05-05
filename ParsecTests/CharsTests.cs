@@ -1,10 +1,10 @@
 ﻿using System;
-using NUnit.Framework;
-using Parsec.Core;
 using System.Linq;
+using NUnit.Framework;
 using Parsec;
+using Parsec.Core;
 
-namespace Parsec.Tests
+namespace ParsecTests
 {
     [TestFixture()]
     public class CharsTests
@@ -12,7 +12,7 @@ namespace Parsec.Tests
         [Test()]
         public void RepeatTest()
         {
-            var repeatI = Chars.Char('I').Repeat();
+            var repeatI = Chars.One('I').Repeat();
             repeatI("nt".AsPlainCharStream()).Match(
                 success: (restStream, chars) => { Assert.AreEqual("", new String(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
@@ -23,7 +23,7 @@ namespace Parsec.Tests
                 success: (restStream, chars) => { Assert.AreEqual("IIIIII", new String(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
 
-            var repeat1I = Chars.Char('I').Repeat1();
+            var repeat1I = Chars.One('I').RepeatAtLeast1();
             repeat1I("nt".AsPlainCharStream()).Match(
                 success: (restStream, chars) => { Assert.Fail(); return 0; },
                 failure: (restStream, error) => /*OK*/ 0);
@@ -81,8 +81,8 @@ namespace Parsec.Tests
         [Test()]
         public void AndTest()
         {
-            var iParser = Chars.Char('I');
-            var nParser = Chars.Char('n');
+            var iParser = Chars.One('I');
+            var nParser = Chars.One('n');
             var parser = iParser.And(nParser);
             parser("Int".AsPlainCharStream()).Match(
                 success: (restStream, c) =>
@@ -100,7 +100,7 @@ namespace Parsec.Tests
         [Test()]
         public void CharTest()
         {
-            var parser = Chars.Char('I');
+            var parser = Chars.One('I');
             parser("Int".AsPlainCharStream()).Match(
                 success: (restStream, c) =>
                 {
@@ -151,18 +151,113 @@ namespace Parsec.Tests
             parser("黄".AsPlainCharStream()).Match(
                 success: (restStream, c) => { Assert.AreEqual('黄', c); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
+        }
+
+        [Test()]
+        public void DigitTest()
+        {
+            var parser = Chars.Digit();
+            parser("0".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('0', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("I".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
+            parser("黄".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
+            parser("".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
+        }
+
+        [Test()]
+        public void LetterOrDigitTest()
+        {
+            var parser = Chars.LetterOrDigit();
+            parser("I".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('I', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("0".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('0', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("黄".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.AreEqual('黄', c); return 0; },
+                failure: (restStream, error) => { Assert.Fail(); return 0; });
+            parser("".AsPlainCharStream()).Match(
+                success: (restStream, c) => { Assert.Fail(); return 0; },
+                failure: (restStream, error) => /*OK*/ 0);
         }
 
         [Test()]
         public void AnyTest()
         {
-            var parser = Combinators.Any(Chars.Char('I'), Chars.Char('J'), Chars.Char('K'));
+            var parser = Combinators.Any(Chars.One('I'), Chars.One('J'), Chars.One('K'));
             Assert.IsTrue(parser("I".AsPlainCharStream()).Success());
             Assert.IsTrue(parser("J".AsPlainCharStream()).Success());
             Assert.IsTrue(parser("K".AsPlainCharStream()).Success());
             Assert.IsFalse(parser("L".AsPlainCharStream()).Success());
             Assert.IsFalse(parser("M".AsPlainCharStream()).Success());
             Assert.IsFalse(parser("".AsPlainCharStream()).Success());
+        }
+
+        [Test()]
+        public void CharAnyTest()
+        {
+            var parser = "IJK".Any();
+            Assert.IsTrue(parser("I".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("J".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("K".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("L".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("M".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("".AsPlainCharStream()).Success());
+        }
+
+        [Test()]
+        public void RepeatNTest()
+        {
+            var parser = Chars.Letter().RepeatN(3);
+            parser("ABCDEF".AsPlainCharStream()).Match(
+                success: (restStream, tokens) =>
+                {
+                    Assert.AreEqual("ABC", new String(tokens));
+                    Assert.AreEqual("DEF", new String(parser(restStream).GetOutput()));
+                    return 0;
+                },
+                failure: (restStream, error) =>
+                {
+                    Assert.Fail();
+                    return 0;
+                });
+            parser("AB".AsPlainCharStream()).Match(
+                success: (restStream, tokens) =>
+                {
+                    Assert.Fail();
+                    return 0;
+                },
+                failure: (restStream, error) => /* OK */ 0);
+        }
+
+        [Test()]
+        public void HexDigitTest()
+        {
+            var parser = Chars.HexDigit().RepeatN(22);
+            parser("0123456789ABCDEFabcdef".AsPlainCharStream()).Match(
+                success: (restStream, tokens) =>
+                {
+                    Assert.AreEqual("0123456789ABCDEFabcdef", new String(tokens));
+                    Assert.IsTrue(Chars.EndOfInput()(restStream).Success());
+                    return 0;
+                },
+                failure: (restStream, error) =>
+                {
+                    Assert.Fail();
+                    return 0;
+                });
+            Assert.IsFalse(Chars.HexDigit()("g".AsPlainCharStream()).Success());
         }
     }
 }

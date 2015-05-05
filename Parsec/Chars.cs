@@ -69,37 +69,58 @@ namespace Parsec
 
         public static Parser<Char, IList<Char>> Sequance(IEnumerable<Char> seq)
         {
-            return seq.Select(Char).Sequence();
+            return seq.Select(One).Sequence();
         }
 
-        public static Parser<Char, Char> Char(Char c)
+        public static Parser<Char, Char> One(Char c)
         {
-            return stream =>
-                stream.Current.Match(
-                    exists: token => token == c
-                        ? Result.Success(stream.MoveNext(), token)
-                        : Failure<Char>(stream, "Char not match"),
-                    nothing: () => EndOfInput<Char>(stream));
+            return Satisfy(token => token == c);
+        }
+
+        public static Parser<Char, Char> HexDigit()
+        {
+            return Satisfy(c => ('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'));
         }
 
         public static Parser<Char, Char> Letter()
         {
+            return Satisfy(System.Char.IsLetter);
+        }
+
+        public static Parser<Char, Char> Digit()
+        {
+            return Satisfy(System.Char.IsDigit);
+        }
+
+        public static Parser<Char, Char> LetterOrDigit()
+        {
+            return Satisfy(System.Char.IsLetterOrDigit);
+        }
+
+        public static Parser<Char, Char> Not(Char c)
+        {
+            return Satisfy(token => token != c);
+        }
+
+        public static Parser<Char, Char> Satisfy(Func<Char, Boolean> pred)
+        {
             return stream => stream.Current.Match(
-                exists: token => System.Char.IsLetter(token)
+                exists: token => pred(token)
                     ? Result.Success(stream.MoveNext(), token)
-                    : Failure<Char>(stream, "Not letter"),
+                    : Failure<Char>(stream, "Not Satisfy"),
                 nothing: () => EndOfInput<Char>(stream));
         }
 
-        public static Parser<Char, Char> Any(IEnumerable<Char> chars)
+        public static Parser<Char, Char> Any(this IEnumerable<Char> chars)
         {
             var set = chars.ToLookup(c => c);
-            return stream =>
-                stream.Current.Match(
-                    exists: token => set.Contains(token)
-                        ? Result.Success(stream.MoveNext(), token)
-                        : Failure<Char>(stream, "No match"),
-                    nothing: () => EndOfInput<Char>(stream));
+            return Satisfy(set.Contains);
+        }
+
+        public static Parser<Char, Char> NoneOf(this IEnumerable<Char> chars)
+        {
+            var set = chars.ToLookup(c => c);
+            return Satisfy(token => !set.Contains(token));
         }
 
         public static IResult<Char, TOutput> Failure<TOutput>(ITokenStream<Char> stream, String reason)
