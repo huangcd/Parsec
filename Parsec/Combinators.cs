@@ -44,7 +44,7 @@ namespace Parsec
         {
             return stream =>
             {
-                IResult<TToken, TOutput> result = Result.Failure<TToken, TOutput>(stream, Error.Create("No parser"));
+                var result = Result.Failure<TToken, TOutput>(stream, Error.Create("No parser"));
                 foreach (var parser in parsers)
                 {
                     result = parser(stream);
