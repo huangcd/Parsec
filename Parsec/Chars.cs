@@ -45,11 +45,20 @@ namespace Parsec
             }
         }
 
+        /// <summary>
+        /// Convert a list of char to ITokenStream
+        /// </summary>
+        /// <param name="chars"></param>
+        /// <returns></returns>
         public static ITokenStream<Char> AsPlainCharStream(this IEnumerable<Char> chars)
         {
             return new PlainCharStream(chars);
         }
 
+        /// <summary>
+        /// Return a parser to check whether the given stream is consumed
+        /// </summary>
+        /// <returns></returns>
         public static Parser<Char, Nothing> EndOfInput()
         {
             return stream =>
