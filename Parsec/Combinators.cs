@@ -125,10 +125,33 @@ namespace Parsec
         public static Parser<TToken, TOutput[]> Repeat<TToken, TOutput>(
             this Parser<TToken, TOutput> parser)
         {
-            return Repeat1(parser).Or(Succeed<TToken, TOutput[]>(new TOutput[0]));
+            return RepeatAtLeast1(parser).Or(Succeed<TToken, TOutput[]>(new TOutput[0]));
         }
 
-        public static Parser<TToken, TOutput[]> Repeat1<TToken, TOutput>(
+        public static Parser<TToken, TOutput[]> RepeatN<TToken, TOutput>(
+            this Parser<TToken, TOutput> parser,
+            int n)
+        {
+            return stream =>
+            {
+                var result = Result.Failure<TToken, TOutput[]>(stream, Error.Create("Not match"));
+                var output = new TOutput[n];
+                var tempStream = stream;
+                for (var i = 0; i < n; i++)
+                {
+                    var partialResult = parser(tempStream);
+                    if (!partialResult.Success())
+                    {
+                        return result;
+                    }
+                    output[i] = partialResult.GetOutput();
+                    tempStream = partialResult.GetRestStream();
+                }
+                return Result.Success(tempStream, output);
+            };
+        }
+
+        public static Parser<TToken, TOutput[]> RepeatAtLeast1<TToken, TOutput>(
             this Parser<TToken, TOutput> parser)
         {
             // Raw implementation
