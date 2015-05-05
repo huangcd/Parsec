@@ -32,5 +32,24 @@ namespace JsonParser
         public static Parser<Char, Char> Unicode = Slash.And(
             Chars.One('u').And(Chars.HexDigit().RepeatN(4)),
             (_, digits) => (Char)Int32.Parse(new String(digits), NumberStyles.HexNumber));
+
+        public static Parser<Char, String> String()
+        {
+            var tokens = Combinators.Any(
+                Chars.NoneOf("\\\""),
+                QuotationMark,
+                SlashMark,
+                ReverseSlashMark,
+                BackSpaceMark,
+                FormfeedMark,
+                NewLineMark,
+                CarriageReturnMark,
+                TabMark,
+                Unicode);
+            return from start in Quote
+                   from chars in Combinators.Repeat(tokens)
+                   from end in Quote
+                   select new String(chars);
+        }
     }
 }
