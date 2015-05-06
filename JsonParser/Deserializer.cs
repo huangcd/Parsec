@@ -1,22 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using Parsec;
 using Parsec.Core;
 
 namespace JsonParser
 {
-    public class JObject
-    {
-    }
-
-    public class JString : JObject
-    {
-    }
-
     public static class Deserializer
     {
         public static Parser<Char, Char> Quote = Chars.One('"');
@@ -33,10 +22,10 @@ namespace JsonParser
             Chars.One('u').And(Chars.HexDigit().RepeatN(4)),
             (_, digits) => (Char)Int32.Parse(new String(digits), NumberStyles.HexNumber));
 
-        public static Parser<Char, String> String()
+        public static Parser<Char, JValue> String()
         {
             var tokens = Combinators.Any(
-                Chars.NoneOf("\\\""),
+                "\\\"".NoneOf(),
                 QuotationMark,
                 SlashMark,
                 ReverseSlashMark,
@@ -47,9 +36,9 @@ namespace JsonParser
                 TabMark,
                 Unicode);
             return from start in Quote
-                   from chars in Combinators.Repeat(tokens)
+                   from chars in tokens.Repeat()
                    from end in Quote
-                   select new String(chars);
+                   select (JValue)(new String(chars));
         }
     }
 }
