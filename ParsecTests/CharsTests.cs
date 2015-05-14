@@ -12,7 +12,7 @@ namespace ParsecTests
         [Test()]
         public void RepeatTest()
         {
-            var repeatI = Chars.One('I').Repeat();
+            var repeatI = Chars.One('I').Many();
             repeatI("nt".AsPlainCharStream()).Match(
                 success: (restStream, chars) => { Assert.AreEqual("", new String(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
@@ -207,7 +207,7 @@ namespace ParsecTests
         [Test()]
         public void CharAnyTest()
         {
-            var parser = "IJK".Any();
+            var parser = "IJK".OneOf();
             Assert.IsTrue(parser("I".AsPlainCharStream()).Success());
             Assert.IsTrue(parser("J".AsPlainCharStream()).Success());
             Assert.IsTrue(parser("K".AsPlainCharStream()).Success());

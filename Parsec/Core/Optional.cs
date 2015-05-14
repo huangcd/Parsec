@@ -9,6 +9,13 @@ namespace Parsec.Core
 
     public static class Optional
     {
+        public static TValue GetOrDefault<TValue>(this IOptional<TValue> optional, TValue defaultValue)
+        {
+            return optional.Match(
+                exists: value => value,
+                nothing: () => defaultValue);
+        }
+
         public static Boolean HasValue<TValue>(this IOptional<TValue> optional)
         {
             return optional.Match(

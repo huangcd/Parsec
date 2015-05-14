@@ -122,10 +122,26 @@ namespace Parsec
             return stream => Result.Success(stream, output);
         }
 
-        public static Parser<TToken, TOutput[]> Repeat<TToken, TOutput>(
+        /// <summary>
+        /// many applies the parser zero or more times. Returns a list of the returned values of parser.
+        /// </summary>
+        /// <typeparam name="TToken"></typeparam>
+        /// <typeparam name="TOutput"></typeparam>
+        /// <param name="parser"></param>
+        /// <returns></returns>
+        public static Parser<TToken, TOutput[]> Many<TToken, TOutput>(
             this Parser<TToken, TOutput> parser)
         {
             return RepeatAtLeast1(parser).Or(Succeed<TToken, TOutput[]>(new TOutput[0]));
+        }
+
+        public static Parser<TToken, IOptional<TOutput>> Optional<TToken, TOutput>(
+            this Parser<TToken, TOutput> parser)
+        {
+            return stream =>
+                parser(stream).Match(
+                    success: (restStream, token) => Result.Success(restStream, Core.Optional.Just(token)),
+                    failure: (restStream, error) => Result.Success(stream, Core.Optional.Nothing<TOutput>()));
         }
 
         public static Parser<TToken, TOutput[]> RepeatN<TToken, TOutput>(
@@ -159,16 +175,24 @@ namespace Parsec
             //    failure: Result.Failure<TToken, TOutput[]>,
             //    success: (restStream, output) =>
             //    {
-            //        return parser.Repeat()(restStream).Match(
+            //        return parser.Many()(restStream).Match(
             //            failure: (repeatRestStream, error) => Result.Success(repeatRestStream, new[] { output }),
             //            success: (repeatRestStream, repeatOutput) => Result.Success(repeatRestStream, new[] { output }.Concat(repeatOutput).ToArray()));
             //    });
 
             // Linq implementation
-            // return parser.SelectMany(x => Repeat(parser), (x, xs) => (new[] { x }).Concat(xs).ToArray());
+            // return parser.SelectMany(x => Many(parser), (x, xs) => (new[] { x }).Concat(xs).ToArray());
             return from x in parser
-                   from xs in Repeat(parser)
+                   from xs in Many(parser)
                    select (new[] { x }).Concat(xs).ToArray();
+        }
+
+        public static Parser<TToken, Nothing> SkipMany<TToken, TOutput>(
+            this Parser<TToken, TOutput> parser)
+        {
+            return stream => parser.Many()(stream).Match(
+                success: (restStream, token) => Result.Success(restStream, Nothing.Instance),
+                failure: Result.Failure<TToken, Nothing>);
         }
     }
 }

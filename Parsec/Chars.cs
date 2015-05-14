@@ -84,17 +84,17 @@ namespace Parsec
 
         public static Parser<Char, Char> Letter()
         {
-            return Satisfy(System.Char.IsLetter);
+            return Satisfy(Char.IsLetter);
         }
 
         public static Parser<Char, Char> Digit()
         {
-            return Satisfy(System.Char.IsDigit);
+            return Satisfy(Char.IsDigit);
         }
 
         public static Parser<Char, Char> LetterOrDigit()
         {
-            return Satisfy(System.Char.IsLetterOrDigit);
+            return Satisfy(Char.IsLetterOrDigit);
         }
 
         public static Parser<Char, Char> Not(Char c)
@@ -111,7 +111,7 @@ namespace Parsec
                 nothing: () => EndOfInput<Char>(stream));
         }
 
-        public static Parser<Char, Char> Any(this IEnumerable<Char> chars)
+        public static Parser<Char, Char> OneOf(this IEnumerable<Char> chars)
         {
             var set = chars.ToLookup(c => c);
             return Satisfy(set.Contains);
@@ -121,6 +121,16 @@ namespace Parsec
         {
             var set = chars.ToLookup(c => c);
             return Satisfy(token => !set.Contains(token));
+        }
+
+        public static Parser<Char, Char> Space()
+        {
+            return Satisfy(Char.IsWhiteSpace);
+        }
+
+        public static Parser<Char, Nothing> Spaces()
+        {
+            return Space().SkipMany();
         }
 
         public static IResult<Char, TOutput> Failure<TOutput>(ITokenStream<Char> stream, String reason)
