@@ -16,7 +16,7 @@ namespace Parsec.Core
                 nothing: () => defaultValue);
         }
 
-        public static Boolean HasValue<TValue>(this IOptional<TValue> optional)
+        public static bool HasValue<TValue>(this IOptional<TValue> optional)
         {
             return optional.Match(
                 exists: val => true,
@@ -49,7 +49,7 @@ namespace Parsec.Core
 
             public override string ToString()
             {
-                return String.Format("[Optional Nothing]");
+                return string.Format("[Optional Nothing]");
             }
         }
 
@@ -69,7 +69,7 @@ namespace Parsec.Core
 
             public override string ToString()
             {
-                return String.Format("[Optional {0}]", _val);
+                return string.Format("[Optional {0}]", _val);
             }
         }
     }

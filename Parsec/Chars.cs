@@ -7,41 +7,41 @@ namespace Parsec
 {
     public static class Chars
     {
-        private sealed class PlainCharStream : ITokenStream<Char>
+        private sealed class PlainCharStream : ITokenStream<char>
         {
-            private readonly Char[] _chars;
+            private readonly char[] _chars;
             private readonly int _position;
 
-            internal PlainCharStream(IEnumerable<Char> chars)
+            internal PlainCharStream(IEnumerable<char> chars)
             {
                 _chars = chars.ToArray();
                 _position = 0;
             }
 
-            private PlainCharStream(Char[] chars, int position)
+            private PlainCharStream(char[] chars, int position)
             {
                 _chars = chars;
                 _position = position;
             }
 
-            public ITokenStream<Char> MoveNext()
+            public ITokenStream<char> MoveNext()
             {
                 return new PlainCharStream(_chars, _position + 1);
             }
 
-            public IOptional<Char> Current
+            public IOptional<char> Current
             {
                 get
                 {
                     return _position < _chars.Length
                         ? Optional.Just(_chars[_position])
-                        : Optional.Nothing<Char>();
+                        : Optional.Nothing<char>();
                 }
             }
 
             public override string ToString()
             {
-                return new String(_chars, _position, _chars.Length - _position);
+                return new string(_chars, _position, _chars.Length - _position);
             }
         }
 
@@ -50,7 +50,7 @@ namespace Parsec
         /// </summary>
         /// <param name="chars"></param>
         /// <returns></returns>
-        public static ITokenStream<Char> AsPlainCharStream(this IEnumerable<Char> chars)
+        public static ITokenStream<char> AsPlainCharStream(this IEnumerable<char> chars)
         {
             return new PlainCharStream(chars);
         }
@@ -59,7 +59,7 @@ namespace Parsec
         /// Return a parser to check whether the given stream is consumed
         /// </summary>
         /// <returns></returns>
-        public static Parser<Char, Nothing> EndOfInput()
+        public static Parser<char, Nothing> EndOfInput()
         {
             return stream =>
                 stream.Current.Match(
@@ -67,78 +67,78 @@ namespace Parsec
                     nothing: () => Result.Success(stream.MoveNext(), Nothing.Instance));
         }
 
-        public static Parser<Char, IList<Char>> Sequance(IEnumerable<Char> seq)
+        public static Parser<char, IList<char>> Sequance(IEnumerable<char> seq)
         {
             return seq.Select(One).Sequence();
         }
 
-        public static Parser<Char, Char> One(Char c)
+        public static Parser<char, char> One(char c)
         {
             return Satisfy(token => token == c);
         }
 
-        public static Parser<Char, Char> HexDigit()
+        public static Parser<char, char> HexDigit()
         {
             return Satisfy(c => ('0' <= c && c <= '9') || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'));
         }
 
-        public static Parser<Char, Char> Letter()
+        public static Parser<char, char> Letter()
         {
-            return Satisfy(Char.IsLetter);
+            return Satisfy(char.IsLetter);
         }
 
-        public static Parser<Char, Char> Digit()
+        public static Parser<char, char> Digit()
         {
-            return Satisfy(Char.IsDigit);
+            return Satisfy(char.IsDigit);
         }
 
-        public static Parser<Char, Char> LetterOrDigit()
+        public static Parser<char, char> LetterOrDigit()
         {
-            return Satisfy(Char.IsLetterOrDigit);
+            return Satisfy(char.IsLetterOrDigit);
         }
 
-        public static Parser<Char, Char> Not(Char c)
+        public static Parser<char, char> Not(char c)
         {
             return Satisfy(token => token != c);
         }
 
-        public static Parser<Char, Char> Satisfy(Func<Char, Boolean> pred)
+        public static Parser<char, char> Satisfy(Func<char, bool> pred)
         {
             return stream => stream.Current.Match(
                 exists: token => pred(token)
                     ? Result.Success(stream.MoveNext(), token)
-                    : Failure<Char>(stream, "Not Satisfy"),
-                nothing: () => EndOfInput<Char>(stream));
+                    : Failure<char>(stream, "Not Satisfy"),
+                nothing: () => EndOfInput<char>(stream));
         }
 
-        public static Parser<Char, Char> OneOf(this IEnumerable<Char> chars)
+        public static Parser<char, char> OneOf(this IEnumerable<char> chars)
         {
             var set = chars.ToLookup(c => c);
             return Satisfy(set.Contains);
         }
 
-        public static Parser<Char, Char> NoneOf(this IEnumerable<Char> chars)
+        public static Parser<char, char> NoneOf(this IEnumerable<char> chars)
         {
             var set = chars.ToLookup(c => c);
             return Satisfy(token => !set.Contains(token));
         }
 
-        public static Parser<Char, Char> Space()
+        public static Parser<char, char> Space()
         {
-            return Satisfy(Char.IsWhiteSpace);
+            return Satisfy(char.IsWhiteSpace);
         }
 
-        public static Parser<Char, Nothing> Spaces()
+        public static Parser<char, Nothing> Spaces()
         {
             return Space().SkipMany();
         }
 
-        public static IResult<Char, TOutput> Failure<TOutput>(ITokenStream<Char> stream, String reason)
+        public static IResult<char, TOutput> Failure<TOutput>(ITokenStream<char> stream, string reason)
         {
-            return Result.Failure<Char, TOutput>(stream, Error.Create(reason));
+            return Result.Failure<char, TOutput>(stream, Error.Create(reason));
         }
 
-        public static IResult<Char, TOutput> EndOfInput<TOutput>(ITokenStream<Char> stream)
+        public static IResult<char, TOutput> EndOfInput<TOutput>(ITokenStream<char> stream)
         {
             return Failure<TOutput>(stream, "End of input");
         }

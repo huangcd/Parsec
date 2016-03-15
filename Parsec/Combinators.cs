@@ -65,7 +65,7 @@ namespace Parsec
 
         public static Parser<TToken, TOutput> Where<TToken, TOutput>(
             this Parser<TToken, TOutput> parser,
-            Func<TOutput, Boolean> pred)
+            Func<TOutput, bool> pred)
         {
             return stream => parser(stream).Match(
                 failure: Result.Failure<TToken, TOutput>,

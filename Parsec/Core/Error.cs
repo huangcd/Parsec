@@ -4,24 +4,24 @@ namespace Parsec.Core
 {
     public interface IError
     {
-        String Message { get; }
+        string Message { get; }
     }
 
     public static class Error
     {
-        public static IError Create(String message)
+        public static IError Create(string message)
         {
             return new ErrorImpl(message);
         }
 
-        public static IError EndOfInput(String message)
+        public static IError EndOfInput(string message)
         {
             return new EndOfInputImpl(message);
         }
 
         private sealed class EndOfInputImpl : IError
         {
-            internal EndOfInputImpl(String message)
+            internal EndOfInputImpl(string message)
             {
                 Message = message;
             }
@@ -33,7 +33,7 @@ namespace Parsec.Core
 
         private sealed class ErrorImpl : IError
         {
-            internal ErrorImpl(String message)
+            internal ErrorImpl(string message)
             {
                 Message = message;
             }

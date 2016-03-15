@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Parsec;
 using Parsec.Core;
+using System;
+using System.Linq;
 
 namespace ParsecTests
 {
@@ -14,13 +14,13 @@ namespace ParsecTests
         {
             var repeatI = Chars.One('I').Many();
             repeatI("nt".AsPlainCharStream()).Match(
-                success: (restStream, chars) => { Assert.AreEqual("", new String(chars)); return 0; },
+                success: (restStream, chars) => { Assert.AreEqual("", new string(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
             repeatI("Int".AsPlainCharStream()).Match(
-                success: (restStream, chars) => { Assert.AreEqual("I", new String(chars)); return 0; },
+                success: (restStream, chars) => { Assert.AreEqual("I", new string(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
             repeatI("IIIIIInt".AsPlainCharStream()).Match(
-                success: (restStream, chars) => { Assert.AreEqual("IIIIII", new String(chars)); return 0; },
+                success: (restStream, chars) => { Assert.AreEqual("IIIIII", new string(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
 
             var repeat1I = Chars.One('I').RepeatAtLeast1();
@@ -28,10 +28,10 @@ namespace ParsecTests
                 success: (restStream, chars) => { Assert.Fail(); return 0; },
                 failure: (restStream, error) => /*OK*/ 0);
             repeat1I("Int".AsPlainCharStream()).Match(
-                success: (restStream, chars) => { Assert.AreEqual("I", new String(chars)); return 0; },
+                success: (restStream, chars) => { Assert.AreEqual("I", new string(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
             repeat1I("IIIIIInt".AsPlainCharStream()).Match(
-                success: (restStream, chars) => { Assert.AreEqual("IIIIII", new String(chars)); return 0; },
+                success: (restStream, chars) => { Assert.AreEqual("IIIIII", new string(chars)); return 0; },
                 failure: (restStream, error) => { Assert.Fail(); return 0; });
         }
 
@@ -42,7 +42,7 @@ namespace ParsecTests
             letParser("let".AsPlainCharStream()).Match(
                 success: (restStream, chars) =>
                 {
-                    Assert.AreEqual("let", new String(chars.ToArray()));
+                    Assert.AreEqual("let", new string(chars.ToArray()));
                     Assert.IsTrue(Chars.EndOfInput()(restStream).Success());
                     return 0;
                 },
@@ -54,7 +54,7 @@ namespace ParsecTests
             letParser("leta".AsPlainCharStream()).Match(
                 success: (restStream, chars) =>
                 {
-                    Assert.AreEqual("let", new String(chars.ToArray()));
+                    Assert.AreEqual("let", new string(chars.ToArray()));
                     return 0;
                 },
                 failure: (restStream, error) =>
@@ -223,8 +223,8 @@ namespace ParsecTests
             parser("ABCDEF".AsPlainCharStream()).Match(
                 success: (restStream, tokens) =>
                 {
-                    Assert.AreEqual("ABC", new String(tokens));
-                    Assert.AreEqual("DEF", new String(parser(restStream).GetOutput()));
+                    Assert.AreEqual("ABC", new string(tokens));
+                    Assert.AreEqual("DEF", new string(parser(restStream).GetOutput()));
                     return 0;
                 },
                 failure: (restStream, error) =>
@@ -248,7 +248,7 @@ namespace ParsecTests
             parser("0123456789ABCDEFabcdef".AsPlainCharStream()).Match(
                 success: (restStream, tokens) =>
                 {
-                    Assert.AreEqual("0123456789ABCDEFabcdef", new String(tokens));
+                    Assert.AreEqual("0123456789ABCDEFabcdef", new string(tokens));
                     Assert.IsTrue(Chars.EndOfInput()(restStream).Success());
                     return 0;
                 },
