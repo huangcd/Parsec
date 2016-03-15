@@ -194,5 +194,28 @@ namespace Parsec
                 success: (restStream, token) => Result.Success(restStream, Nothing.Instance),
                 failure: Result.Failure<TToken, Nothing>);
         }
+
+        public static Parser<TToken, TOutput> Except<TToken, TOutput>(
+            this Parser<TToken, TOutput> leftParser,
+            Parser<TToken, TOutput> rightParser
+        )
+        {
+            return stream => leftParser(stream).Match(
+                failure: Result.Failure<TToken, TOutput>,
+                success: (restStrea1, output1) => rightParser(stream).Match(
+                    failure: (restStream2, error) => Result.Success(restStream2, output1),
+                    success: (restStream2, output2) => Result.Failure<TToken, TOutput>(stream, Error.Create("Match both"))));
+        }
+
+        public static Parser<TToken, TOutput[]> Split<TToken, TOutput, TSplitter>(
+            this Parser<TToken, TOutput> parser,
+            Parser<TToken, TSplitter> splitter
+        )
+        {
+            return from x in parser
+                   from sp in Optional(splitter)
+                   from xs in Split(parser, splitter)
+                   select (new[] { x }).Concat(xs).ToArray();
+        }
     }
 }

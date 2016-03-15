@@ -205,6 +205,17 @@ namespace ParsecTests
         }
 
         [Test()]
+        public void ExceptTest()
+        {
+            var parser = "IJK".OneOf().Except(Chars.One('I'));
+            Assert.IsFalse(parser("I".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("J".AsPlainCharStream()).Success());
+            Assert.IsTrue(parser("K".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("L".AsPlainCharStream()).Success());
+            Assert.IsFalse(parser("A".AsPlainCharStream()).Success());
+        }
+
+        [Test()]
         public void CharAnyTest()
         {
             var parser = "IJK".OneOf();
