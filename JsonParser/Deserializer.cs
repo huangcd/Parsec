@@ -37,7 +37,7 @@ namespace JsonParser
                                               Unicode)
                                          .Many()
                 from end in Quote
-                select (JValue)(new string(chars));
+                select (JValue)new string(chars);
 
         public static Parser<TToken, TOutput[]> Concat<TToken, TOutput>(
             this Parser<TToken, TOutput> singleParser,

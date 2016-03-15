@@ -184,7 +184,7 @@ namespace Parsec
             // return parser.SelectMany(x => Many(parser), (x, xs) => (new[] { x }).Concat(xs).ToArray());
             return from x in parser
                    from xs in Many(parser)
-                   select (new[] { x }).Concat(xs).ToArray();
+                   select new[] { x }.Concat(xs).ToArray();
         }
 
         public static Parser<TToken, Nothing> SkipMany<TToken, TOutput>(
@@ -215,7 +215,7 @@ namespace Parsec
             return from x in parser
                    from sp in Optional(splitter)
                    from xs in Split(parser, splitter)
-                   select (new[] { x }).Concat(xs).ToArray();
+                   select new[] { x }.Concat(xs).ToArray();
         }
     }
 }
